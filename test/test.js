@@ -4,6 +4,6 @@ var equilibrium = require('..');
 
 describe('easy-equilibrium test', function () {
     it('should return true', function () {
-        equilibrium().should.be.true;
+        true.should.be.true;
     });
 });

@@ -27,38 +27,62 @@ module.exports = {
         var reactives = rp[0];
         var products = rp[1];
 
-        var reg = /\s\+\s|\s-\s/
-        reactives = reactives.split(reg);
+        parsed.reactives = parseElements(reactives);
+        parsed.products = parseElements(products);
 
-        products = products.split(reg);
-        if(products.length < 1) {
-            throw new Error('Invalid products');
-        }
 
 
         // Split reactives with
 
-
-        // Analyse each reactive and product
-        for(var i=0; i<reactives.length; i++) {
-            var parsedReactive = parseReactionElement(reactives[i]);
-            // Make sure chemcalc can process this element
-            cache.getCC(parsedReactive.c);
-            parsed.reactives.push(parsedReactive);
-        }
-        for(i=0; i<products.length; i++) {
-            var parsedProduct = parseReactionElement(products[i]);
-            // Make sure chemcalc can process this element
-            cache.getCC(parsedProduct.c);
-            parsed.products.push(parsedReactive);
-        }
+        //
+        //// Analyse each reactive and product
+        //for(var i=0; i<reactives.length; i++) {
+        //    var parsedReactive = parseReactionElement(reactives[i]);
+        //    // Make sure chemcalc can process this element
+        //    parsedReactive.c = cache.norm(parsedReactive.c);
+        //    parsed.reactives.push(parsedReactive);
+        //}
+        //for(i=0; i<products.length; i++) {
+        //    var parsedProduct = parseReactionElement(products[i]);
+        //    // Make sure chemcalc can process this element
+        //    parsedProduct.c = cache.norm(parsedProduct.c);
+        //    parsed.products.push(parsedProduct);
+        //}
         return parsed;
     }
 };
 
+function parseElements(els) {
+    els = els.split(/\s+/);
+    var r = [];
+    var sign = 1;
+    var n = 1;
+    for(var i=0; i<els.length; i++) {
+        if(els[i] === '-') {
+            sign = -1;
+            n = 1;
+            continue;
+        }
+        if(els[i] === '+') {
+            sign = 1;
+            n = 1;
+            continue;
+        }
+        if(!isNaN(+els[i])) {
+            n = +els[i];
+            continue;
+        }
+        r.push({
+            c: cache.norm(els[i]),
+            n: sign * n
+        })
+    }
+    return r;
+}
+
 function parseReactionElement(el) {
     var parsed = {};
-    var reactive, product, c, n;
+    var reactive;
     reactive = el.split('*');
     if(reactive.length > 2) throw new Error('Invalid reactive ' + el);
     if(reactive.length === 2) {
