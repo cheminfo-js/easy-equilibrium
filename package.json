@@ -38,5 +38,8 @@
     "should": "latest",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0"
+  },
+  "dependencies": {
+    "chemcalc": "^2.1.4"
   }
 }
