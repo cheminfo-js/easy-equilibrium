@@ -26,10 +26,8 @@ module.exports = {
         return chemcalcs[c];
     },
 
-    norm: function() {
+    norm: function(c) {
         var cc = module.exports.getCC(c);
-        return mByMW[''+cc.mw];
-    },
-
-
+        return cByMW[''+cc.mw];
+    }
 };

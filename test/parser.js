@@ -7,6 +7,5 @@ describe('Reaction parser', function () {
         (function() {
             parser.parseReaction('H2O -> H+ + OH-');
         }).should.not.throw();
-
     });
 });
