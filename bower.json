@@ -1,0 +1,27 @@
+{
+  "name": "easy-equilibrium",
+  "version": "0.0.0",
+  "description": "Wrapper for cheminfo-js/equilibrium library to make it easier to use",
+  "keywords": [
+    "equilibrium",
+    "chemistry"
+  ],
+  "main": [
+    "dist/easy-equilibrium.js",
+    "dist/easy-equilibrium.min.js"
+  ],
+  "authors": [
+    "Daniel Kostro"
+  ],
+  "homepage": "https://github.com/cheminfo-js/easy-equilibrium",
+  "license": "MIT",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "ignore": [
+    "/*",
+    "!dist/*"
+  ]
+}
