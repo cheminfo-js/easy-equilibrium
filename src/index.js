@@ -178,6 +178,33 @@ EasyEq.prototype.hasSolvent = function() {
     return this.desc.solvent !== undefined && this.desc.solvent !== 'none';
 };
 
+EasyEq.prototype.setEquilibriumActivity = function(c, concentration) {
+    c = cache.norm(c);
+    var idx = this.components.indexOf(c);
+    if(idx === -1) throw new Error('Cannot set equilibrium activity of non-components');
+    return this.equilibrium.setEquilibriumActivity(idx, concentration);
+};
+
+EasyEq.prototype.setTotalConcentration = function(c, concentration) {
+    c = cache.norm(c);
+    var idx = this.components.indexOf(c);
+    if(idx === -1) throw new Error('Cannot set total concentration of non-components');
+    return this.equilibrium.setTotalConcentration(idx, concentration);
+};
+
+EasyEq.prototype.calculate = function() {
+    this.equilibrium.calculate.apply(this.equilibrium, arguments);
+};
+
+EasyEq.prototype.getSpeciesConcentrations = function() {
+    var c = this.equilibrium.getSolutionSpeciesConcentrations();
+    console.log(c.length);
+    var r = {};
+    for(var i=0; i< c.length; i++) {
+        r[this.species[i]] = c[i];
+    }
+    return r;
+};
 
 
 function fillArray(arr, val) {

@@ -17,3 +17,12 @@ var desc = {
 };
 
 var eq = new Eq(desc);
+
+for(var ph=4.75; ph<=4.75; ph++) {
+    var H = Math.pow(10, -ph);
+    console.log(H);
+    eq.setEquilibriumActivity('H+', H);
+    eq.calculate(true, false);
+    var c = eq.getSpeciesConcentrations();
+    console.log(c);
+}
