@@ -13,11 +13,13 @@ function EasyEq(desc) {
     this._coefficients();
     this._concentrations();
     this._constants();
+    this._precipitationCoefficients();
+    this._precipitationConstants();
 
     //
     this.equilibrium = new Equilibrium({
-        precipitationConstants: [],
-        precipitationCoefficients: [[]],
+        precipitationConstants: this.precipitationConstants || [],
+        precipitationCoefficients: this.precipitationCoefficients || [[]],
         solutionConstants: this.constants,
         solutionSpeciesCharges: this.charges,
         solutionCoefficients: this.coefficients,
@@ -30,6 +32,7 @@ function EasyEq(desc) {
 EasyEq.prototype._init = function() {
     this.Ka = {};
     this.equationsHash = {};
+    var i, rname;
     this.equations = this.desc.eq.filter(function(v, i) {
         return i%2 === 0;
     });
@@ -37,10 +40,24 @@ EasyEq.prototype._init = function() {
     var constants = this.desc.eq.filter(function(v, i) {
         return i%2 === 1;
     });
-    for(var i=0; i<this.equations.length; i++) {
-        var rname = cache.norm(parser.parseReaction(this.equations[i]).reactives[0].c);
+    for(i=0; i<this.equations.length; i++) {
+        rname = cache.norm(parser.parseReaction(this.equations[i]).reactives[0].c);
         this.Ka[rname] = constants[i];
         this.equationsHash[rname] = this.equations[i];
+    }
+
+    if(!this.desc.precipitations) return;
+
+    this.precipitationConstants = this.desc.precipitations.filter(function(v, i) {
+        return i%2 === 1;
+    });
+    this.precipitations = this.desc.precipitations.filter(function(v,i){
+        return i%2 === 0;
+    });
+
+
+    for(i=0; i<this.precipitations.length; i++) {
+        rname = cache.norm(parser.parseReaction(this.precipitations[i]).reactives[0].c);
     }
 };
 
@@ -52,8 +69,11 @@ EasyEq.prototype._components = function() {
         if(parsed.reactives.length !== 1 || parsed.products.length !== 1) continue;
         var rname = cache.norm(parsed.reactives[0].c);
         var pname = cache.norm(parsed.products[0].c);
-        if(rname !== pname) continue;
-        this.components[i] = rname;
+        if(rname !== pname) {
+            console.log('continue');
+            continue;
+        }
+        this.components.push(rname);
     }
 
     // Order components
@@ -118,13 +138,43 @@ EasyEq.prototype._coefficients = function() {
         var parsed = parser.parseReaction(this.equationsHash[key]);
         for(i=0; i<parsed.products.length; i++) {
             var product = parsed.products[i];
-            var cidx = this.components.indexOf(product.c);
+            var cidx = this.components.indexOf(cache.norm(product.c));
             if(cidx === -1) throw new Error('Cannot find component ' + product.c); // TODO: search for dependencies
             this.coefficients[idx][cidx] += product.n;
         }
     }
     console.log('coefficients', this.coefficients);
 };
+
+EasyEq.prototype._precipitationCoefficients = function() {
+    if(!this.desc.precipitations) return;
+    this.precipitationCoefficients = new Array(this.precipitations.length);
+    for(var i=0; i<this.precipitations.length; i++) {
+        this.precipitationCoefficients[i] = new Array(this.components.length);
+        fillArray(this.precipitationCoefficients[i], 0);
+    }
+
+
+
+    for(var j=0; j<this.precipitations.length; j++) {
+        var parsed = parser.parseReaction(this.precipitations[j]);
+        for(i=0; i<parsed.products.length; i++) {
+            var product = parsed.products[i];
+            var cidx = this.components.indexOf(cache.norm(product.c));
+            if(cidx === -1) throw new Error('Cannot find component ' + product.c); // TODO: search for dependencies
+            this.precipitationCoefficients[j][cidx] += product.n;
+        }
+    }
+    console.log('precipitation coefficients', this.precipitationCoefficients);
+};
+
+EasyEq.prototype._precipitationConstants = function() {
+      if(!this.desc.precipitations) return;
+    for(var i=0;i<this.precipitationConstants.length; i++) {
+        // this.precipitationConstants[i] = 1/this.precipitationConstants[i];
+    }
+    console.log('precipitation constants', this.precipitationConstants);
+ };
 
 EasyEq.prototype._concentrations = function() {
     this.totalConcentrations = [];
@@ -205,6 +255,14 @@ EasyEq.prototype.getSpeciesConcentrations = function() {
     }
     return r;
 };
+
+EasyEq.prototype.saturationIndices = function() {
+    return this.equilibrium.saturationIndices();
+};
+
+EasyEq.prototype.finalConcentrations = function() {
+    return this.equilibrium.finalConcentrations();
+}
 
 
 function fillArray(arr, val) {
