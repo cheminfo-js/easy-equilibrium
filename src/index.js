@@ -139,7 +139,9 @@ EasyEq.prototype._coefficients = function() {
         for(i=0; i<parsed.products.length; i++) {
             var product = parsed.products[i];
             var cidx = this.components.indexOf(cache.norm(product.c));
-            if(cidx === -1) throw new Error('Cannot find component ' + product.c); // TODO: search for dependencies
+            if(cidx === -1) {
+                throw new Error('Cannot find component ' + product.c);
+            } // TODO: search for dependencies
             this.coefficients[idx][cidx] += product.n;
         }
     }

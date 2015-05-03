@@ -75,9 +75,22 @@ function parseElements(els) {
         r.push({
             c: cache.norm(els[i]),
             n: sign * n
-        })
+        });
     }
-    return r;
+    var count = {};
+    for(i=0; i< r.length; i++) {
+        if(!count[r[i].c]) count[r[i].c] = r[i].n;
+        else count[r[i].c] += r[i].n;
+    }
+
+    var rr = [];
+    for(var key in count) {
+        rr.push({
+            c: key,
+            n: count[key]
+        });
+    }
+    return rr;
 }
 
 function parseReactionElement(el) {
