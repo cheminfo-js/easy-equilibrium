@@ -25,7 +25,7 @@ function EasyEq(desc) {
         solutionCoefficients: this.coefficients,
         totalConcentrations: this.totalConcentrations,
         fixedActivities: this.fixedConcentrations,
-        randomGenerator: ['seed', 123]
+        randomGenerator: this.desc.randomGenerator
     });
 }
 
@@ -136,16 +136,46 @@ EasyEq.prototype._coefficients = function() {
         var idx = this.species.indexOf(key);
         if(idx === -1) throw new Error('Cannot find specie');
         var parsed = parser.parseReaction(this.equationsHash[key]);
-        for(i=0; i<parsed.products.length; i++) {
-            var product = parsed.products[i];
+
+        // Rewrite products as linear combinations of components
+        var products = this._rebase(parsed.products);
+        //var products = parsed.products;
+        for(i=0; i<products.length; i++) {
+            var product = products[i];
             var cidx = this.components.indexOf(cache.norm(product.c));
             if(cidx === -1) {
+                console.log(this.components);
                 throw new Error('Cannot find component ' + product.c);
-            } // TODO: search for dependencies
+
+            }
             this.coefficients[idx][cidx] += product.n;
         }
     }
     console.log('coefficients', this.coefficients);
+};
+
+EasyEq.prototype._rebase = function(elements) {
+    var r = [];
+    for(var i=0; i<elements.length; i++) {
+        var replaced = false;
+        var idx = this.components.indexOf(elements[i].c);
+        var idxs = this.species.indexOf(elements[i].c);
+        if(idx === -1 && idxs > -1) {
+            var eq = this.equationsHash[this.species[idxs]];
+            if(eq) {
+                var parsed = parser.parseReaction(eq);
+                for(var j=0; j<parsed.products.length; j++) {
+                    parsed.products[j].n *= elements[i].n;
+                    r.push(parsed.products[j]);
+                }
+                replaced = true;
+            }
+        }
+        if(!replaced) {
+            r.push(elements[i]);
+        }
+    }
+    return r;
 };
 
 EasyEq.prototype._precipitationCoefficients = function() {
@@ -160,10 +190,14 @@ EasyEq.prototype._precipitationCoefficients = function() {
 
     for(var j=0; j<this.precipitations.length; j++) {
         var parsed = parser.parseReaction(this.precipitations[j]);
-        for(i=0; i<parsed.products.length; i++) {
-            var product = parsed.products[i];
+        var products = this._rebase(parsed.products);
+        for(i=0; i<products.length; i++) {
+            var product = products[i];
             var cidx = this.components.indexOf(cache.norm(product.c));
-            if(cidx === -1) throw new Error('Cannot find component ' + product.c); // TODO: search for dependencies
+            if(cidx === -1) {
+                console.log(this.components);
+                throw new Error('Cannot find component ' + product.c);
+            }
             this.precipitationCoefficients[j][cidx] += product.n;
         }
     }

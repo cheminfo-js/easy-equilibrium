@@ -28,15 +28,13 @@ var desc = {
 };
 
 var eq = new Eq(desc);
-var count = 0;
-for(var ph=1; ph<=14; ph=ph+0.02) {
-    console.log(count);
-    count++;
+for(var ph=2; ph<=2; ph=ph+0.02) {
     var H = Math.pow(10, -ph);
     eq.setEquilibriumActivity('H+', H);
     eq.calculate(true, false);
     var x = eq.finalConcentrations();
-    //console.log(x);
+
+    console.log(x);
     //var c = eq.getSpeciesConcentrations();
     var solProducts = eq.saturationIndices();
 }
