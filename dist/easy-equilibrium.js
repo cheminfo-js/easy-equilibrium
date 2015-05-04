@@ -1,6 +1,6 @@
 /**
  * easy-equilibrium - Wrapper for cheminfo-js/equilibrium library to make it easier to use
- * @version v0.1.0
+ * @version v0.1.1
  * @link https://github.com/cheminfo-js/easy-equilibrium
  * @license MIT
  */
@@ -37,6 +37,13 @@ function EasyEq(desc) {
 }
 
 EasyEq.prototype._init = function() {
+    // Check fixed parameter
+    this.desc.fixed = this.desc.fixed || [];
+    if(this.desc.fixed === 'none') this.desc.fixed = [];
+    if(!Array.isArray(this.desc.fixed)) {
+        this.desc.fixed = [this.desc.fixed];
+    }
+
     this.Ka = {};
     this.equationsHash = {};
     var i, rname;
@@ -85,18 +92,22 @@ EasyEq.prototype._components = function() {
 
     // Order components
     // Find fixed component
+    var idx;
     if(this.desc.fixed) {
-        var fixed = cache.norm(this.desc.fixed);
-        var idx = this.components.indexOf(fixed);
-        if(idx > -1) {
-            this.components.splice(idx,1);
-            this.components.push(fixed);
+        for(var j=0; j<this.desc.fixed.length; j++) {
+            var fixed = cache.norm(this.desc.fixed[j]);
+            idx = this.components.indexOf(fixed);
+            if(idx > -1) {
+                this.components.splice(idx,1);
+                this.components.push(fixed);
+            }
         }
+
     }
 
     if(this.desc.solvent) {
         var solvent = cache.norm(this.desc.solvent);
-        var idx = this.components.indexOf(solvent);
+        idx = this.components.indexOf(solvent);
         if(idx > -1) {
             this.components.splice(idx, 1);
             this.components.push(solvent);
@@ -255,12 +266,13 @@ EasyEq.prototype.isSolvent = function(c) {
 };
 
 EasyEq.prototype.isFixed = function(c) {
-    if(this.desc.fixed === undefined || this.desc.fixed === 'none'){
-        return false;
+    var c1,c2;
+    for(var i=0; i<this.desc.length; i++) {
+        c1 = cache.norm(this.desc.fixed);
+        c2 = cache.norm(c);
+        if(c1 === c2) return true;
     }
-    var c1 = cache.norm(this.desc.fixed);
-    var c2 = cache.norm(c);
-    return c1 === c2;
+    return false;
 };
 
 EasyEq.prototype.hasFixed = function() {
