@@ -6,10 +6,10 @@ var _ = require('lodash');
 
 var CaFeCO3 = {
     eq: [
+        'H+ -> H+', 1,
         'CO3-- -> CO3--', 1,
         'Ca++   -> Ca++', 1,
         'Fe++   -> Fe++', 1,
-        'H+ -> H+', 1,
         'H2O  -> H2O', 1,
         'OH- -> H2O - H+', 1e14,
         'HCO3- -> H+ + CO3--', 1/(2.1e10),
@@ -22,7 +22,7 @@ var CaFeCO3 = {
         'FeO2H2 -> Fe++ + 2 H2O - 2 H+', 4.87e21
     ],
     solvent: 'H2O',
-    fixed: 'H+',
+    fixed: ['H+'],
     concentrations: {
         'H+': 0.1,
         'Fe++': 0.07,

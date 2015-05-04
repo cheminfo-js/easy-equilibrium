@@ -6,7 +6,6 @@ var _ = require('lodash');
 describe('Reaction parser', function () {
     it('H2O -> H+ - 2 OH-', function () {
         var r = parser.parseReaction('H2O -> H+ - 2 OH-');
-        console.log(r);
         var isequal = _.isEqual(r, {
             reactives: [{ c: 'H2O', n: 1}],
             products: [{ c: 'H+', n: 1}, {c:'OH-', n: -2}]
