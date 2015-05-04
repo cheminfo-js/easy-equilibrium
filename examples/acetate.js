@@ -9,7 +9,7 @@ var desc = {
         'H+   -> H+', 1
     ],
     solvent: 'H2O',
-    fixed: 'H(+1)',
+    fixed: ['H(+1)'],
     concentrations: {
         'H+': 0.1,
         'AcO-': 0.5

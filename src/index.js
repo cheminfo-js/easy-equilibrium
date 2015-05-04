@@ -260,8 +260,8 @@ EasyEq.prototype.isSolvent = function(c) {
 
 EasyEq.prototype.isFixed = function(c) {
     var c1,c2;
-    for(var i=0; i<this.desc.length; i++) {
-        c1 = cache.norm(this.desc.fixed);
+    for(var i=0; i<this.desc.fixed.length; i++) {
+        c1 = cache.norm(this.desc.fixed[i]);
         c2 = cache.norm(c);
         if(c1 === c2) return true;
     }
