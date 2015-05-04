@@ -36,20 +36,23 @@ describe('easy-equilibrium', function () {
     it('Rebase', function() {
         var eq = new Equilibrium(CaFeCO3);
         var el = parser.parseReaction('FeO2H2 -> Fe++ + 2 OH-');
-        console.log('un-rebased', el.products);
         var rebased = eq._rebase(el.products);
-        console.log('Rebased', rebased);
-        var r = _.isEqual(rebased, [ { c: 'Fe++', n: 1 }, { c: 'H2O', n: 2 }, { c: 'H+', n: -2 } ]);
-        r.should.be.true;
+        _.isEqual(rebased, [ { c: 'Fe++', n: 1 }, { c: 'H2O', n: 2 }, { c: 'H+', n: -2 } ]).should.be.true;
     });
 
-    it('Unindependant', function() {
+    it('Component not found in solution', function() {
         (function() {
             var desc1 = _.cloneDeep(CaFeCO3);
             desc1.eq[12] = 'HCO3- -> 2 H+ + CO2';
-            var eq = new Equilibrium(desc1);
+            new Equilibrium(desc1);
         }).should.throw('Cannot find component CO2');
+    });
 
-
+    it('Component not found in precipitations', function() {
+        (function() {
+            var desc1 = _.cloneDeep(CaFeCO3);
+            desc1.precipitations[0] = 'CaCO3 -> Ca++ + HSO4(2-)';
+            new Equilibrium(desc1);
+        }).should.throw('Cannot find component HSO4(2-)');
     })
 });
