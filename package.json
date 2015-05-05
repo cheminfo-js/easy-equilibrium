@@ -41,7 +41,7 @@
     "vinyl-source-stream": "^1.0.0"
   },
   "dependencies": {
-    "chem-equilibrium": "^1.1.0",
+    "chem-equilibrium": "^1.1.1",
     "chemcalc": "^2.1.4"
   }
 }
