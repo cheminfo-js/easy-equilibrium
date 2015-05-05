@@ -1,6 +1,6 @@
 /**
  * easy-equilibrium - Wrapper for cheminfo-js/equilibrium library to make it easier to use
- * @version v0.1.2
+ * @version v0.1.3
  * @link https://github.com/cheminfo-js/easy-equilibrium
  * @license MIT
  */
@@ -32,7 +32,8 @@ function EasyEq(desc) {
         solutionCoefficients: this.coefficients,
         totalConcentrations: this.totalConcentrations,
         fixedActivities: this.fixedConcentrations,
-        randomGenerator: this.desc.randomGenerator
+        randomGenerator: this.desc.randomGenerator,
+        maxGuesses: this.desc.maxGuesses
     });
 }
 
@@ -3871,6 +3872,7 @@ function EquilibriumCalculator(options) {
     if(options instanceof EquilibriumCalculator) {
         var eq = options;
         this.rnd = eq.rnd;
+        this.maxGuesses = eq.maxGuesses;
         this.solutionSpeciesConstants = eq.getSolutionEquilibriumConstants();
         this.solutionSpeciesCoefficients = eq.getSolutionSpeciesCoefficients();
         this.solutionSpeciesCharges = eq.getSolutionSpeciesCharges();
@@ -3912,7 +3914,7 @@ function EquilibriumCalculator(options) {
     else {
         //initiate equilibrium constants, coefficients, total concentrations, and number of solids/precipitation rxns from input
         optionsAsProperties(this, options);
-
+        if(!this.maxGuesses) this.maxGuesses = 1000;
         if(typeof options.randomGenerator === 'function') {
             this.rnd = options.randomGenerator
         }
@@ -4309,10 +4311,10 @@ EquilibriumCalculator.prototype.removeZeroConcentrations = function()
 
 EquilibriumCalculator.prototype.calculate = function(correctActivities, fixedIonicStrength, maxIterations, precision, maxGuesses) {
     if(arguments.length === 2) {
-        return this.calculate(correctActivities, fixedIonicStrength, 99999, 1000, 0.0001);
+        return this.calculate(correctActivities, fixedIonicStrength, 99999, this.maxGuesses, 0.0001);
     }
     else if(arguments.length === 4) {
-        return this.calculate(correctActivities, fixedIonicStrength, maxIterations, 1000, precision);
+        return this.calculate(correctActivities, fixedIonicStrength, maxIterations, this.maxGuesses, precision);
     }
     else if(arguments.length === 5) {
         var tmp; tmp = maxGuesses;
@@ -4328,19 +4330,19 @@ EquilibriumCalculator.prototype.calculate = function(correctActivities, fixedIon
                 nGuesses++;
                 result = calculateOnePoint(this, correctActivities, fixedIonicStrength, maxIterations, precision);
                 if (result == maxIterations) {
-                    console.log("maximum number of iterations reached, result is not trustworthy");
+                    //console.log("maximum number of iterations reached, result is not trustworthy");
                 }
-                console.log("Solution found will now be checked");
+                //console.log("Solution found will now be checked");
                 while ((hasNegative(this.finalConcentrations(), this.nSolutionSpecies + this.nSolids)) && (nGuesses < maxGuesses)) {
                     nGuesses++;
-                    console.log("Inadequate solution (negative, infinite, or not a number), computing with the " + nGuesses + "th  guess");
+                    //console.log("Inadequate solution (negative, infinite, or not a number), computing with the " + nGuesses + "th  guess");
 
                     guess(this, correctActivities, fixedIonicStrength);
                     result = calculateOnePoint(this, correctActivities, fixedIonicStrength, maxIterations, precision);
                     if (result == maxIterations) {
-                        console.log("maximum number of iterations reached, result is not trustworthy");
+                        //console.log("maximum number of iterations reached, result is not trustworthy");
                     }
-                    console.log("Solution found will now be checked");
+                    //console.log("Solution found will now be checked");
                 }
                 if (hasNegative(this.finalConcentrations(), this.nSolutionSpecies + this.nSolids)) {
                     return "No successful guess";
@@ -4403,7 +4405,7 @@ function calculatedSolventActivity(ctx) {
 function guess(ctx, correctActivities, fixedIonicStrength)
 {
     var factor = ctx.rnd();
-    console.log('factor', factor);
+    //console.log('factor', factor);
     var i;
     //guess variable component activities
     for (i = 0; i < ctx.nFixedTotalConcentrations; i++) {
@@ -4821,13 +4823,14 @@ function equilibrate(ctx, correctActivities, fixedIonicStrength, solids, maxIter
         iterations++;
     }
     if (iterations === 1) {
-        console.log("Equilibrium reached after " + iterations + " iterations");
+        //console.log("Equilibrium reached after " + iterations + " iterations");
         return iterations;
     }
-    if (iterations > maxIterations)
-        console.log("maximum number of iterations reached without convergence");
+    if (iterations > maxIterations) {
+        //console.log("maximum number of iterations reached without convergence");
+    }
     else {
-        console.log("Equilibrium reached after " + (iterations - 1) + " iterations");
+        //console.log("Equilibrium reached after " + (iterations - 1) + " iterations");
     }
     return iterations - 1;
 }
@@ -4876,7 +4879,7 @@ function calculateOnePoint(ctx, correctActivities, fixedIonicStrength, maxIterat
     var solidsToPrecipitate = [];
     var precipitationCycles = 0;
     var i;
-    console.log("Iterating solution towards equilibrium...");
+    //console.log("Iterating solution towards equilibrium...");
     var result = equilibrate(ctx, correctActivities, fixedIonicStrength, solidsToPrecipitate, maxIterations, precision);
 
     if (ctx.nSolids > 0) {
@@ -4896,8 +4899,8 @@ function calculateOnePoint(ctx, correctActivities, fixedIonicStrength, maxIterat
         while ((saturationIndices[currentSolid] - 1.0 > precision) && (precipitationCycles <= ctx.nSolids))
         {
             precipitationCycles++;
-            console.log("Solid " + currentSolid + " is over-saturated and will be included in the global balance");
-            console.log("Iterating the extended system towards equilibrium...");
+            //console.log("Solid " + currentSolid + " is over-saturated and will be included in the global balance");
+            //console.log("Iterating the extended system towards equilibrium...");
             solidsToPrecipitate = solidsToPrecipitate.slice(0, solidsToPrecipitate.length + 1);
             solidsToPrecipitate[(solidsToPrecipitate.length - 1)] = currentSolid;
             equilibrate(ctx, correctActivities, fixedIonicStrength, solidsToPrecipitate, maxIterations, precision);
@@ -4915,10 +4918,10 @@ function calculateOnePoint(ctx, correctActivities, fixedIonicStrength, maxIterat
     }
 
     if (precipitationCycles > ctx.nSolids) {
-        console.log("Solid phases could not be equilibrated with the solution");
+        //console.log("Solid phases could not be equilibrated with the solution");
         return maxIterations;
     }
-    console.log("All solid phases are now in equilibrium with the solution");
+    //console.log("All solid phases are now in equilibrium with the solution");
     return result;
 }
 
