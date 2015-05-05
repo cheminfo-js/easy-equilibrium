@@ -25,7 +25,8 @@ function EasyEq(desc) {
         solutionCoefficients: this.coefficients,
         totalConcentrations: this.totalConcentrations,
         fixedActivities: this.fixedConcentrations,
-        randomGenerator: this.desc.randomGenerator
+        randomGenerator: this.desc.randomGenerator,
+        maxGuesses: this.desc.maxGuesses
     });
 }
 
