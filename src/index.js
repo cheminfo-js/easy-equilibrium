@@ -78,7 +78,6 @@ EasyEq.prototype._components = function() {
         var rname = cache.norm(parsed.reactives[0].c);
         var pname = cache.norm(parsed.products[0].c);
         if(rname !== pname) {
-            console.log('continue');
             continue;
         }
         this.components.push(rname);
@@ -107,7 +106,6 @@ EasyEq.prototype._components = function() {
             this.components.push(solvent);
         }
     }
-    console.log('components', this.components);
 };
 
 EasyEq.prototype._species = function() {
@@ -119,7 +117,6 @@ EasyEq.prototype._species = function() {
         var rname = cache.norm(parsed.reactives[0].c);
         if(this.species.indexOf(rname) === -1) this.species.push(rname);
     }
-    console.log('species', this.species);
 };
 
 EasyEq.prototype._charges = function() {
@@ -132,7 +129,6 @@ EasyEq.prototype._charges = function() {
         }
         this.charges.push(totalCharge);
     }
-    console.log('charges', this.charges);
 };
 
 EasyEq.prototype._coefficients = function() {
@@ -156,14 +152,12 @@ EasyEq.prototype._coefficients = function() {
             var product = products[i];
             var cidx = this.components.indexOf(cache.norm(product.c));
             if(cidx === -1) {
-                console.log(this.components);
                 throw new Error('Cannot find component ' + product.c);
 
             }
             this.coefficients[idx][cidx] += product.n;
         }
     }
-    console.log('coefficients', this.coefficients);
 };
 
 EasyEq.prototype._rebase = function(elements) {
@@ -207,13 +201,11 @@ EasyEq.prototype._precipitationCoefficients = function() {
             var product = products[i];
             var cidx = this.components.indexOf(cache.norm(product.c));
             if(cidx === -1) {
-                console.log(this.components);
                 throw new Error('Cannot find component ' + product.c);
             }
             this.precipitationCoefficients[j][cidx] += product.n;
         }
     }
-    console.log('precipitation coefficients', this.precipitationCoefficients);
 };
 
 EasyEq.prototype._precipitationConstants = function() {
@@ -221,7 +213,6 @@ EasyEq.prototype._precipitationConstants = function() {
     for(var i=0;i<this.precipitationConstants.length; i++) {
         // this.precipitationConstants[i] = 1/this.precipitationConstants[i];
     }
-    console.log('precipitation constants', this.precipitationConstants);
  };
 
 EasyEq.prototype._concentrations = function() {
@@ -236,8 +227,6 @@ EasyEq.prototype._concentrations = function() {
         if(this.isSolvent(this.components[i])) continue;
         this.totalConcentrations.push(this.desc.concentrations[this.components[i]]);
     }
-    console.log('total concentrations', this.totalConcentrations);
-    console.log('fixed concentrations', this.fixedConcentrations);
 };
 
 EasyEq.prototype._constants = function() {
@@ -247,7 +236,6 @@ EasyEq.prototype._constants = function() {
         if(idx === -1) throw new Error('Cannot link ka to specie');
         this.constants[idx] = 1/this.Ka[key];
     }
-    console.log('constants', this.constants);
 };
 
 EasyEq.prototype.isSolvent = function(c) {
@@ -297,7 +285,6 @@ EasyEq.prototype.calculate = function() {
 
 EasyEq.prototype.getSpeciesConcentrations = function() {
     var c = this.equilibrium.getSolutionSpeciesConcentrations();
-    console.log(c.length);
     var r = {};
     for(var i=0; i< c.length; i++) {
         r[this.species[i]] = c[i];
@@ -311,7 +298,7 @@ EasyEq.prototype.saturationIndices = function() {
 
 EasyEq.prototype.finalConcentrations = function() {
     return this.equilibrium.finalConcentrations();
-}
+};
 
 
 function fillArray(arr, val) {
