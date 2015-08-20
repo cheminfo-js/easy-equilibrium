@@ -37,7 +37,7 @@ describe('easy-equilibrium', function () {
         var eq = new Equilibrium(CaFeCO3);
         var el = parser.parseReaction('FeO2H2 -> Fe++ + 2 OH-');
         var rebased = eq._rebase(el.products);
-        _.isEqual(rebased, [ { c: 'Fe++', n: 1 }, { c: 'H2O', n: 2 }, { c: 'H+', n: -2 } ]).should.be.true;
+        rebased.should.be.eql([ { c: 'Fe++', n: 1 }, { c: 'H2O', n: 2 }, { c: 'H+', n: -2 }])
     });
 
     it('Component not found in solution', function() {
