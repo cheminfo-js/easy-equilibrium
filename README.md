@@ -1,6 +1,6 @@
 easy-equilibrium
 ================
-Wrapper for cheminfo-js/equilibrium library to make it easier to use
+:warning::warning: This project is deprecated. Please use [chem-equilibrium](https://github.com/cheminfo-js/chem-equilibrium) :warning::warning:
 
 ## License
 
